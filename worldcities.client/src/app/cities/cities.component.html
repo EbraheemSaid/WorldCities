@@ -31,6 +31,7 @@
 <!-- Pagination directive -->
 
 <mat-paginator [hidden]="!cities"
+               (page)="getData($event)"
                [pageSize]="5"
                [pageSizeOptions]="[5, 10, 20, 50]"
                showFirstLastButtons></mat-paginator>
