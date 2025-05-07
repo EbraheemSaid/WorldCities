@@ -26,11 +26,20 @@ namespace WorldCities.Server.Controllers
         public async Task<ActionResult<ApiResult<City>>> GetCities(
             int pageIndex = 0,
             int pageSize = 10,
-            string? sortColumnName = null,
-            string? sortOrder = null
+            string? sortColumn = null,
+            string? sortOrder = null,
+            string? filterColumn = null,
+            string? filterQuery = null
             )
         {
-            return await ApiResult<City>.CreateAsync(_context.Cities.AsNoTracking(), pageIndex, pageSize, sortColumnName, sortOrder);
+            return await ApiResult<City>.CreateAsync(
+                _context.Cities.AsNoTracking(),
+                pageIndex,
+                pageSize,
+                sortColumn,
+                sortOrder,
+                filterColumn,
+                filterQuery);
         }
 
         // GET: api/Cities/5

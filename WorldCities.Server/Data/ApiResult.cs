@@ -11,14 +11,18 @@ namespace WorldCities.Server.Data
             int count,
             int pageIndex,
             int pageSize,
-            string? sortColumnName,
-            string? sortOrder)
+            string? sortColumn,
+            string? sortOrder,
+            string? filterColumn,
+            string? filterQuery)
         {
             Data = data;
             PageIndex = pageIndex;
             PageSize = pageSize;
             SortOrder = sortOrder;
-            SortColumnName = sortColumnName;
+            SortColumn = sortColumn;
+            FilterColumn = filterColumn;
+            FilterQuery = filterQuery;
             TotalCount = count;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         }
@@ -27,18 +31,31 @@ namespace WorldCities.Server.Data
             IQueryable<T> source,
             int pageIndex,
             int pageSize,
-            string? sortColumnName = null,
-            string? sortOrder = null)
+            string? sortColumn = null,
+            string? sortOrder = null,
+            string? filterColumn = null,
+            string? filterQuery = null)
 
         {
+            if (!string.IsNullOrEmpty(filterColumn)
+                && !string.IsNullOrEmpty(filterQuery)
+                && IsValidProperty(filterColumn))
+            {
+                source = source.Where(
+                string.Format("{0}.StartsWith(@0)", filterColumn),
+                    filterQuery);
+
+            }
+
             var count = await source.CountAsync();
-            if (!string.IsNullOrEmpty(sortColumnName) && isValidProperty(sortColumnName))
+
+            if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn))
             {
                 sortOrder = !string.IsNullOrEmpty(sortOrder) && sortOrder.ToUpper() == "ASC"
                     ? "ASC"
                     : "DESC";
 
-                source = source.OrderBy(string.Format("{0} {1}", sortColumnName, sortOrder));
+                source = source.OrderBy(string.Format("{0} {1}", sortColumn, sortOrder));
             }
 
 
@@ -47,11 +64,11 @@ namespace WorldCities.Server.Data
 
             var data = await source.ToListAsync();
 
-            return new ApiResult<T>(data, count, pageIndex, pageSize, sortColumnName, sortOrder);
+            return new ApiResult<T>(data, count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
 
         }
 
-        public static bool isValidProperty(string propertyName, bool throwExceptionIfNotFound = true)
+        public static bool IsValidProperty(string propertyName, bool throwExceptionIfNotFound = true)
         {
             var prop = typeof(T).GetProperty(
                 propertyName,
@@ -72,7 +89,9 @@ namespace WorldCities.Server.Data
         public int PageIndex { get; private set; }
         public int PageSize { get; private set; }
         public string? SortOrder { get; set; }
-        public string? SortColumnName { get; set; }
+        public string? SortColumn { get; set; }
+        public string? FilterColumn { get; set; }
+        public string? FilterQuery { get; set; }
         public int TotalCount { get; private set; }
         public int TotalPages { get; private set; }
         public bool HasPreviousPage => PageIndex > 0;
