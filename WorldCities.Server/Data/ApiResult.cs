@@ -18,6 +18,7 @@ namespace WorldCities.Server.Data
             PageIndex = pageIndex;
             PageSize = pageSize;
             SortOrder = sortOrder;
+            SortColumnName = sortColumnName;
             TotalCount = count;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         }
@@ -71,7 +72,7 @@ namespace WorldCities.Server.Data
         public int PageIndex { get; private set; }
         public int PageSize { get; private set; }
         public string? SortOrder { get; set; }
-        public string? sortColumnName { get; set; }
+        public string? SortColumnName { get; set; }
         public int TotalCount { get; private set; }
         public int TotalPages { get; private set; }
         public bool HasPreviousPage => PageIndex > 0;
